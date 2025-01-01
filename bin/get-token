@@ -1,0 +1,20 @@
+#!/bin/bash
+
+set -eo pipefail
+
+# If github app credentials are present, use it to generate a token,
+# otherwise fallback on GITHUB_TOKEN
+#
+# Respects the following env vars:
+# - GITHUB_TOKEN: a personal access token or other github api token
+# - GITHUB_APP_ID: a github app ID
+# - GITHUB_INSTALLATION_ID: a github app installation ID
+# - GITHUB_PRIVATE_KEY: the path to a file containing the github app private key
+
+if [[ -n "$GITHUB_APP_ID" && -n "$GITHUB_INSTALLATION_ID" && -e "$GITHUB_PRIVATE_KEY" ]]; then
+  echo "using github app credentials" >&2
+  gh-token generate --app-id "$GITHUB_APP_ID" --installation-id "$GITHUB_INSTALLATION_ID" --key "$GITHUB_PRIVATE_KEY" --token-only
+else
+  echo "using GITHUB_TOKEN" >&2
+  echo "$GITHUB_TOKEN"
+fi

@@ -1,0 +1,20 @@
+#!/bin/bash
+
+set -eo pipefail
+
+# Clone the repo in GITHUB_REPO_URL repo into /wiki
+#
+# sets up a credential helper and post-commit hook to push to
+# origin/main
+
+git config --global "credential.$GITHUB_REPO_URL.username" x-access-token
+# shellcheck disable=SC2016
+git config --global "credential.$GITHUB_REPO_URL.helper" '!f() { test "$1" = get && echo "password=$(get-token)"; }; f'
+
+git clone "$GITHUB_REPO_URL" /wiki
+
+cat > "/wiki/.git/hooks/post-commit" <<EOF
+#!/bin/sh
+exec push-main-branch
+EOF
+
