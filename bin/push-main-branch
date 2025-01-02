@@ -1,7 +1,0 @@
-#!/bin/bash
-
-set -eo pipefail
-
-# push to origin/main
-# installed as a post-commit hook
-git push origin main

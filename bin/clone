@@ -26,10 +26,3 @@ git clone "$GITHUB_REPO_URL" /wiki
 # install credential helper in repo so it persists across different
 # containers
 cd /wiki && install_credential_helper
-
-cat > /wiki/.git/hooks/post-commit <<EOF
-#!/bin/sh
-exec push-main-branch
-EOF
-
-chmod +x /wiki/.git/hooks/post-commit
