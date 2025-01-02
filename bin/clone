@@ -7,11 +7,25 @@ set -eo pipefail
 # sets up a credential helper and post-commit hook to push to
 # origin/main
 
-git config --global "credential.$GITHUB_REPO_URL.username" x-access-token
-# shellcheck disable=SC2016
-git config --global "credential.$GITHUB_REPO_URL.helper" '!f() { test "$1" = get && echo "password=$(get-token)"; }; f'
+install_credential_helper() {
+  local global_opt
+
+  if [[ "$1" == global ]]; then
+    global_opt="--global"
+  fi
+
+  git config $global_opt "credential.$GITHUB_REPO_URL.username" x-access-token
+  # shellcheck disable=SC2016
+  git config $global_opt "credential.$GITHUB_REPO_URL.helper" '!f() { test "$1" = get && echo "password=$(get-token)"; }; f'
+}
+
+# install credential helper globally for initial clone
+install_credential_helper global
 
 git clone "$GITHUB_REPO_URL" /wiki
+# install credential helper in repo so it persists across different
+# containers
+cd /wiki && install_credential_helper
 
 cat > "/wiki/.git/hooks/post-commit" <<EOF
 #!/bin/sh
